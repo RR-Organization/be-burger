@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/page', [PageController::class, 'getAllData']);
 Route::post('/page/create', [PageController::class, 'createData']);
+Route::post('/page/update/{id}', [PageController::class, 'updateData']);

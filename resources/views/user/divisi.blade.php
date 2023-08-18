@@ -38,28 +38,40 @@
                     ['para', ['ul', 'ol', 'paragraph']],
                     ['insert', ['link']],
                     ['view', ['fullscreen', 'codeview', 'help']]
-                ]
+                ],
             });
         });
 
+
         $(document).ready(function() {
             var isEditMode = false;
-            // fungsi create and update
+            var currentId = '';
+
+            function updateButton(editMode = false, id = '') {
+                isEditMode = editMode;
+                // currentId = id;
+                if (isEditMode) {
+                    $('#formTambah button[type="submit"]').text('Update');
+                } else {
+                    $('#formTambah button[type="submit"]').text('Submit');
+                }
+            }
+
             $('#formTambah').submit(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
-
+                var id = currentId;
                 var description = $('#summernote').summernote('code');
                 formData.append('description', description);
 
-                if (isEditMode) {
-                    var id = $('#id').val();
+                if (isEditMode && id) {
 
                     $('#loading-overlay').show();
-
+                    var description = $('#summernote').summernote('code');
+                    formData.append('description', description);
                     $.ajax({
                         type: "POST",
-                        url: "{{ url('api/v1/4a3f479a-eb2e-498f-aa7b-e7d6e3f0c5f3/pendaftaran/update/') }}/" +
+                        url: "{{ url('api/page/update') }}/" +
                             id,
                         data: formData,
                         dataType: 'json',
@@ -68,7 +80,7 @@
                         success: function(data) {
                             console.log(data);
                             $('#loading-overlay').hide();
-                            if (data.message === 'check your validation') {
+                            if (data.message === 'Check your validation') {
                                 var error = data.errors;
                                 var errorMessage = "";
 
@@ -165,6 +177,7 @@
                                 }).then(function() {
                                     location.reload();
                                 });
+
                             }
                         },
                         error: function(data) {
@@ -187,6 +200,34 @@
                         }
                     });
                 }
+            });
+
+            $(document).ready(function() {
+                function stripHtmlTags(text) {
+                    var div = document.createElement("div");
+                    div.innerHTML = text;
+                    return div.textContent || div.innerText || "";
+                }
+
+                $.ajax({
+                    url: "{{ url('api/page') }}",
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        console.log(data);
+                        if (data.data.length > 0) {
+                            var description = data.data[0].description;
+                            $('#summernote').summernote('code', description);
+                            isEditMode = true;
+                            currentId = data.data[0].id;
+                        }
+
+                        updateButton(isEditMode);
+                    },
+                    error: function() {
+                        alert("Terjadi kesalahan");
+                    }
+                });
             });
         });
     </script>

@@ -4,6 +4,7 @@ namespace App\ApiResponse;
 
 use App\Repository\PageRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class PageResponse
 {
@@ -64,5 +65,40 @@ class PageResponse
                 'data' => $data
             ]);
         
+    }
+
+    public function update(Request $request, $id)
+    {
+        $data = $this->pageRepository->updateData($request, $id);
+        if ($data === 'id-notfound') {
+            return response()->json([
+                'code' => 404,
+                'message' => 'Id or data not found'
+            ]);
+        }
+     
+        if ($data instanceof \Illuminate\Validation\Validator && $data->fails()) {
+            return response()->json([
+                'code' => 422,
+                'message' => 'Check your validation',
+                'errors' => $data->errors()
+            ]);
+        }
+
+        
+
+        if ($data instanceof \Throwable) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Failed',
+                'errors' => $data->getMessage()
+            ]);
+        }else{
+            return response()->json([
+                'code' => 200,
+                'message' => 'success update data',
+                'data' => $data
+            ]);
+        }
     }
 }

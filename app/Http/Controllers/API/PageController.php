@@ -24,4 +24,9 @@ class PageController extends Controller
     {
        return $this->pageResponse->create($request);
     }
+
+    public function updateData (Request $request, $id)
+    {
+        return $this->pageResponse->update($request, $id);
+    }
 }

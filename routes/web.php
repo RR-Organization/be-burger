@@ -15,5 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
-    return view('user.divisi');
+    return view('user.page');
+});
+
+Route::get('/menu', function () {
+    return view('user.menu');
 });
